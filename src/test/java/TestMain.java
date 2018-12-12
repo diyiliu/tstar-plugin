@@ -21,4 +21,24 @@ public class TestMain {
 
         System.out.println(DateUtil.dateToString(date));
     }
+
+    @Test
+    public void test1(){
+        int i = 171;
+
+        System.out.println(CommonUtil.keepDecimal(i, 0.1, 1));
+    }
+
+    @Test
+    public void test2(){
+        String str = "68 00 68 04 13 01 11 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37";
+        byte[] bytes = CommonUtil.hexStringToBytes(str);
+
+        System.out.println(CommonUtil.sumCheck(bytes));
+
+
+        str = "72";
+        bytes = CommonUtil.hexStringToBytes(str);
+        System.out.println(bytes[0]);
+    }
 }

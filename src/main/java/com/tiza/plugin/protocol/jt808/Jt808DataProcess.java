@@ -4,13 +4,20 @@ import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.IDataProcess;
 import com.tiza.plugin.model.Jt808Header;
+import com.tiza.plugin.protocol.hw.HwDataProcess;
 import com.tiza.plugin.util.CommonUtil;
+import com.tiza.plugin.util.JacksonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import kafka.javaapi.producer.Producer;
+import kafka.producer.KeyedMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description: Jt808DataProcess
@@ -27,6 +34,15 @@ public class Jt808DataProcess implements IDataProcess {
     @Resource
     private ICache cmdCacheProvider;
 
+    @Resource
+    protected HwDataProcess hwDataProcess;
+
+    @Resource
+    private Producer kafkaProducer;
+
+    @Value("${kafka.send-topic}")
+    private String sendTopic;
+
     @Override
     public Header parseHeader(byte[] bytes) {
         ByteBuf buf = Unpooled.copiedBuffer(bytes);
@@ -39,7 +55,6 @@ public class Jt808DataProcess implements IDataProcess {
         // 计算校验位
         byte checkReady = CommonUtil.getCheck(checkArray);
         buf.resetReaderIndex();
-
 
         short cmd = buf.readShort();
         int bodyProperty = buf.readUnsignedShort();
@@ -88,5 +103,20 @@ public class Jt808DataProcess implements IDataProcess {
     public void init() {
 
         cmdCacheProvider.put(cmdId, this);
+    }
+
+
+    public void sendToKafka(Jt808Header header, Map param){
+        String terminal = header.getTerminalId();
+
+        Map map = new HashMap();
+        map.put("terminal",terminal);
+        map.put("cmd", header.getCmd());
+        map.put("data", param);
+        map.put("content", CommonUtil.bytesToStr(header.getContent()));
+        map.put("timestamp", System.currentTimeMillis());
+
+        String json = JacksonUtil.toJson(map);
+        kafkaProducer.send(new KeyedMessage(sendTopic, terminal, json));
     }
 }

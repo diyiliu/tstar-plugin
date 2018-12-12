@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -334,8 +335,10 @@ public class CommonUtil {
         return hexStringToBytes(imei);
     }
 
-    public static byte[] packBCD(String sim, int length) {
-        String str = String.format("%0" + (length - sim.length()) + "d", 0) + sim;
+    public static byte[] packBCD(String str, int length) {
+        if (str.length() < length){
+            str = String.format("%0" + (length - str.length()) + "d", 0) + str;
+        }
         byte[] bytes = hexStringToBytes(str);
 
         return bytes;
@@ -373,6 +376,15 @@ public class CommonUtil {
         }
 
         return b;
+    }
+
+    public static byte sumCheck(byte[] bytes){
+        int sum = bytes[0];
+        for (int i = 1; i < bytes.length; i++) {
+            sum += bytes[i];
+        }
+
+        return (byte) (sum & 0xFF);
     }
 
     public static int renderHeight(byte[] bytes) {
@@ -695,5 +707,67 @@ public class CommonUtil {
         buf.writeBytes(header.getContent());
 
         return buf.array();
+    }
+
+    /**
+     * jt808Header to bytes 下发指令
+     *
+     * @param header
+     * @return
+     */
+    public static byte[] jt808HeaderToBytes(Jt808Header header) {
+        byte[] bytes = jt808HeaderToContent(header);
+        byte check = CommonUtil.getCheck(bytes);
+        // 添加校验位
+        byte[] array = Unpooled.copiedBuffer(bytes, new byte[]{check}).array();
+        // 转义
+        array = CommonUtil.encoderJt808Format(array);
+
+        // 添加标识位
+        return Unpooled.copiedBuffer(new byte[]{0x7E}, array, new byte[]{0x7E}).array();
+    }
+
+
+    /**
+     * 生成 jt808 回复指令内容 (不分包)
+     *
+     * @param terminal  设备ID
+     * @param content   需要下行的指令内容
+     * @param cmd       需要下行的命令ID
+     * @param serial    下行的序列号
+     * @return
+     */
+    public static byte[] jt808Response(String terminal, byte[] content, int cmd, int serial) {
+        // 消息体长度
+        int length = content.length;
+
+        Jt808Header header = new Jt808Header();
+        // 不分包
+        header.setSplit((byte) 0);
+        // 不加密
+        header.setEncrypt(0);
+        header.setLength(length);
+        header.setTerminalId(terminal);
+        header.setContent(content);
+        header.setCmd(cmd);
+        header.setSerial(serial);
+
+        // 添加标识位
+        return CommonUtil.jt808HeaderToBytes(header);
+    }
+
+    /**
+     * 命令序号
+     **/
+    private static AtomicLong msgSerial = new AtomicLong(0);
+
+    public static int getMsgSerial() {
+        Long serial = msgSerial.incrementAndGet();
+        if (serial > 65535) {
+            msgSerial.set(0);
+            serial = msgSerial.incrementAndGet();
+        }
+
+        return serial.intValue();
     }
 }
