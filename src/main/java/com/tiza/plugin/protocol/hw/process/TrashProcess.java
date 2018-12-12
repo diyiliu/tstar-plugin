@@ -1,0 +1,165 @@
+package com.tiza.plugin.protocol.hw.process;
+
+import com.tiza.plugin.model.Header;
+import com.tiza.plugin.protocol.hw.HwDataProcess;
+import com.tiza.plugin.protocol.hw.model.HwHeader;
+import com.tiza.plugin.util.CommonUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Description: TrashProcess
+ * Author: DIYILIU
+ * Update: 2018-12-10 14:19
+ */
+
+@Slf4j
+public class TrashProcess extends HwDataProcess {
+
+    public TrashProcess() {
+        this.dataType = 1001;
+    }
+
+    @Override
+    public Header parseHeader(byte[] bytes) {
+        ByteBuf buf = Unpooled.copiedBuffer(bytes);
+        // 0xF1
+        buf.readByte();
+        // 0xFE,0xFE
+        buf.readBytes(new byte[2]);
+
+        byte[] startBytes = new byte[3];
+        buf.readBytes(startBytes);
+
+        int cmd = buf.readByte();
+        int length = buf.readByte();
+        if (buf.readableBytes() < length + 2) {
+            log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(bytes));
+            return null;
+        }
+
+        byte[] content = new byte[length];
+        buf.readBytes(content);
+        // 暂时不验证校验位
+        byte check = buf.readByte();
+        byte endByte = buf.readByte();
+
+        HwHeader header = new HwHeader();
+        header.setStartBytes(startBytes);
+        header.setCmd(cmd);
+        header.setContent(content);
+        header.setEndByte(endByte);
+
+        return header;
+    }
+
+    @Override
+    public void parse(byte[] content, Header header) {
+        HwHeader hwHeader = (HwHeader) header;
+        Map param = new HashMap();
+
+        int cmd = hwHeader.getCmd();
+        ByteBuf buf = Unpooled.copiedBuffer(content);
+        if (0x03 == cmd) {
+            int tempFlag = buf.readByte();
+            double temp = CommonUtil.keepDecimal(buf.readShort(), 0.1, 1);
+            if (tempFlag == 1) {
+                temp *= -1;
+            }
+
+            int n = buf.readByte();
+            if (buf.readableBytes() < n) {
+
+                log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
+            }
+            int[] array = new int[n];
+            for (int i = 0; i < n; i++) {
+                array[i] = buf.readByte();
+            }
+
+            param.put("temp", temp);
+            param.put("bins", array);
+            hwHeader.setParamMap(param);
+
+            return;
+        }
+
+        if (0x04 == cmd) {
+            int authType = buf.readByte();
+            int length = buf.readUnsignedByte();
+            if (buf.readableBytes() < length) {
+
+                log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
+            }
+
+            byte[] array = new byte[length];
+            buf.readBytes(array);
+            String code = new String(array);
+
+            param.put("authType", authType);
+            param.put("code", code);
+            hwHeader.setParamMap(param);
+            return;
+        }
+    }
+
+    @Override
+    public byte[] pack(Header header, Object... argus) {
+        HwHeader hwHeader = (HwHeader) header;
+        int cmd = hwHeader.getCmd();
+
+        byte[] startBytes = hwHeader.getStartBytes();
+
+        if (0x03 == cmd || 0x06 == cmd || 0x07 == cmd) {
+            ByteBuf buf = Unpooled.copiedBuffer(startBytes, new byte[]{(byte) cmd, 0x01, 0x01});
+            return combine(buf.array());
+        }
+
+        if (0x04 == cmd) {
+            int status = (int) argus[0];
+            long account = (long) argus[1];
+            String user = (String) argus[2];
+            int money = (int) argus[3];
+
+            byte[] userBytes = user.getBytes(Charset.forName("UTF-8"));
+            int userLen = userBytes.length;
+            byte[] userArray = new byte[20];
+            System.arraycopy(userBytes, 0, userArray, 0, userLen);
+
+            ByteBuf buf = Unpooled.buffer(40);
+            buf.writeBytes(startBytes);
+            buf.writeByte(cmd);
+            buf.writeByte(35);
+            buf.writeByte(status);
+            buf.writeLong(account);
+            buf.writeByte(userLen);
+            buf.writeBytes(userArray);
+            buf.writeInt(money);
+            buf.writeByte(1);
+
+            return combine(buf.array());
+        }
+
+        return null;
+    }
+
+
+    public byte[] combine(byte[] content) {
+        byte check = CommonUtil.sumCheck(content);
+
+        ByteBuf buf = Unpooled.buffer(content.length + 5);
+        buf.writeByte(0xF1);
+        buf.writeByte(0xFE);
+        buf.writeByte(0xFE);
+        buf.writeBytes(content);
+        buf.writeByte(check);
+        buf.writeByte(0x16);
+
+        return buf.array();
+    }
+}
