@@ -25,4 +25,10 @@ public class BaseConfig {
 
         return new RamCacheProvider();
     }
+
+    @Bean
+    public ICache vehicleInfoProvider(){
+
+        return new RamCacheProvider();
+    }
 }

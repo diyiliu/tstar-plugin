@@ -13,6 +13,7 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,6 +37,12 @@ public class Jt808DataProcess implements IDataProcess {
 
     @Resource
     protected HwDataProcess hwDataProcess;
+
+    @Resource
+    protected ICache vehicleInfoProvider;
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
 
     @Resource
     private Producer kafkaProducer;
@@ -74,7 +81,7 @@ public class Jt808DataProcess implements IDataProcess {
         // 读取消息尾标识位
         buf.readByte();
 
-        if (check != checkReady){
+        if (check != checkReady) {
 
             log.error("校验位验证失败，指令[{}]", CommonUtil.bytesToString(bytes));
             return null;
@@ -105,12 +112,17 @@ public class Jt808DataProcess implements IDataProcess {
         cmdCacheProvider.put(cmdId, this);
     }
 
-
-    public void sendToKafka(Jt808Header header, Map param){
+    /**
+     * 写入 kafka
+     *
+     * @param header
+     * @param param
+     */
+    public void sendToKafka(Jt808Header header, Map param) {
         String terminal = header.getTerminalId();
 
         Map map = new HashMap();
-        map.put("terminal",terminal);
+        map.put("terminal", terminal);
         map.put("cmd", header.getCmd());
         map.put("data", param);
         map.put("content", CommonUtil.bytesToStr(header.getContent()));
@@ -118,5 +130,15 @@ public class Jt808DataProcess implements IDataProcess {
 
         String json = JacksonUtil.toJson(map);
         kafkaProducer.send(new KeyedMessage(sendTopic, terminal, json));
+    }
+
+    /**
+     * 写入数据库
+     *
+     * @param sql
+     */
+    public void sendToDb(String sql, Object... args) {
+
+        jdbcTemplate.update(sql, args);
     }
 }

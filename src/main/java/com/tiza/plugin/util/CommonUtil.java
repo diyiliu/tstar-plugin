@@ -1,8 +1,10 @@
 package com.tiza.plugin.util;
 
+import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Jt808Header;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -10,8 +12,7 @@ import javax.script.ScriptException;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -336,7 +337,7 @@ public class CommonUtil {
     }
 
     public static byte[] packBCD(String str, int length) {
-        if (str.length() < length){
+        if (str.length() < length) {
             str = String.format("%0" + (length - str.length()) + "d", 0) + str;
         }
         byte[] bytes = hexStringToBytes(str);
@@ -344,8 +345,8 @@ public class CommonUtil {
         return bytes;
     }
 
-    public static long parseBCDTime(byte[] bytes){
-        if (bytes.length != 6){
+    public static long parseBCDTime(byte[] bytes) {
+        if (bytes.length != 6) {
             return 0;
         }
 
@@ -378,7 +379,7 @@ public class CommonUtil {
         return b;
     }
 
-    public static byte sumCheck(byte[] bytes){
+    public static byte sumCheck(byte[] bytes) {
         int sum = bytes[0];
         for (int i = 1; i < bytes.length; i++) {
             sum += bytes[i];
@@ -731,10 +732,10 @@ public class CommonUtil {
     /**
      * 生成 jt808 回复指令内容 (不分包)
      *
-     * @param terminal  设备ID
-     * @param content   需要下行的指令内容
-     * @param cmd       需要下行的命令ID
-     * @param serial    下行的序列号
+     * @param terminal 设备ID
+     * @param content  需要下行的指令内容
+     * @param cmd      需要下行的命令ID
+     * @param serial   下行的序列号
      * @return
      */
     public static byte[] jt808Response(String terminal, byte[] content, int cmd, int serial) {
@@ -769,5 +770,20 @@ public class CommonUtil {
         }
 
         return serial.intValue();
+    }
+
+    /**
+     * 更新缓存
+     *
+     * @param oldKeys
+     * @param tempKeys
+     *
+     * @param itemCache
+     */
+    public static void refrechCach(Set oldKeys, Set tempKeys, ICache itemCache) {
+        Collection subKeys = CollectionUtils.subtract(oldKeys, tempKeys);
+        for (Iterator iterator = subKeys.iterator(); iterator.hasNext(); ) {
+            itemCache.remove(iterator.next());
+        }
     }
 }

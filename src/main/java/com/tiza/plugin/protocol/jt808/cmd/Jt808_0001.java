@@ -26,8 +26,6 @@ public class Jt808_0001 extends Jt808DataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         Jt808Header jt808Header = (Jt808Header) header;
-        // 关键字
-        int key = jt808Header.getKey();
 
         ByteBuf buf = Unpooled.copiedBuffer(content);
 
@@ -36,6 +34,6 @@ public class Jt808_0001 extends Jt808DataProcess {
 
         byte result = buf.readByte();
 
-        log.info("终端应答[{}, {}]，应答结果[{}]", CommonUtil.toHex(replyCmd, 4), replySerial, result);
+        log.info("终端[{}]应答[{}, {}]，应答结果[{}]", jt808Header.getTerminalId(), CommonUtil.toHex(replyCmd, 4), replySerial, result);
     }
 }
