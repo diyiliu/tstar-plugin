@@ -63,7 +63,7 @@ public class Jt808_0900 extends Jt808DataProcess {
     public void updateVehicleInfo(HwHeader hwHeader) {
         VehicleInfo vehicleInfo = (VehicleInfo) vehicleInfoProvider.get(hwHeader.getTerminalId());
 
-        String sql = "SELECT t.WORK_PARAM FROM veh_current_position t WHERE t.VBI_ID=" + vehicleInfo.getId();
+        String sql = "SELECT t.work_param FROM veh_current_position t WHERE t.vbi_id=" + vehicleInfo.getId();
         String json = jdbcTemplate.queryForObject(sql, String.class);
 
         // 工况参数
@@ -82,10 +82,10 @@ public class Jt808_0900 extends Jt808DataProcess {
         Object[] args = new Object[]{json, new Date(), vehicleInfo.getId()};
         sql = "UPDATE veh_current_position " +
                 "SET " +
-                " WORK_PARAM = ?," +
-                " MODIFY_TIME = ?" +
+                " work_param = ?," +
+                " modify_time = ?" +
                 "WHERE " +
-                "VBI_ID = ?";
+                "vbi_id = ?";
 
         sendToDb(sql, args);
     }
