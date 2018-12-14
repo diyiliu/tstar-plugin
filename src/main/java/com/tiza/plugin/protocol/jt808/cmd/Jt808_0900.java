@@ -46,10 +46,12 @@ public class Jt808_0900 extends Jt808DataProcess {
             hwHeader.setTime(jt808Header.getGwTime());
 
             hwDataProcess.parse(hwHeader.getContent(), hwHeader);
-            Map param = hwHeader.getParamMap();
+            Map param = new HashMap();
             if (param != null) {
                 // 写入 kafka 准备指令下发
                 param.put("id", hwHeader.getCmd());
+                param.putAll(hwHeader.getParamMap());
+
                 sendToKafka(jt808Header, param);
 
                 // 更新当前表

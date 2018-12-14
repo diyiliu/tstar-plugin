@@ -130,8 +130,8 @@ public class Jt808DataProcess implements IDataProcess {
         Map map = new HashMap();
         map.put("terminal", terminal);
         map.put("cmd", header.getCmd());
-        map.put("data", param);
         map.put("content", CommonUtil.bytesToStr(header.getContent()));
+        map.put("data", param);
         map.put("timestamp", System.currentTimeMillis());
 
         String json = JacksonUtil.toJson(map);

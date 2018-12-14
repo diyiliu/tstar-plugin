@@ -23,6 +23,6 @@ public class Jt808Header extends Header {
     private byte check;
     private int packageCount;
 
-    // 网关时间
+    // 网关接收时间
     private long gwTime;
 }
