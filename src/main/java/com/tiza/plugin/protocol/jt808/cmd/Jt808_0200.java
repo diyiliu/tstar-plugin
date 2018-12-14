@@ -62,45 +62,41 @@ public class Jt808_0200 extends Jt808DataProcess {
                 DateUtil.dateToString(new Date(time)), lat, lng);
 
         String terminalId = jt808Header.getTerminalId();
-        if (vehicleInfoProvider.containsKey(terminalId)) {
-            VehicleInfo vehicleInfo = (VehicleInfo) vehicleInfoProvider.get(terminalId);
-            double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
-            double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
+        VehicleInfo vehicleInfo = (VehicleInfo) vehicleInfoProvider.get(terminalId);
 
-            String province = null, city = null, area = null;
-            String provinceCode = null, cityCode = null, areaCode = null;
-            Location location = LocationParser.getInstance().parse(lngD, latD);
+        double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
+        double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
+        String province = null, city = null, area = null;
+        String provinceCode = null, cityCode = null, areaCode = null;
 
-            if (location != null) {
-                province = location.getProv();
-                city = location.getCity();
-                area = location.getDistrict();
-                provinceCode = location.getProvCode();
-                cityCode = location.getCityCode();
-                areaCode = location.getDistrictCode();
-            }
-
-            Object[] args = new Object[]{lngD, latD, province, city, area,
-                    provinceCode, cityCode, areaCode, new Date(), vehicleInfo.getId()};
-
-            String sql = "UPDATE veh_current_position " +
-                    "SET " +
-                    " VCP_SHIFT_LON = ?," +
-                    " VCP_SHIFT_LAT = ?," +
-                    " VCP_PROVINCE = ?," +
-                    " VCP_CITY = ?," +
-                    " VCP_AREA = ?, " +
-                    " VCP_PROVINCE_CODE = ?," +
-                    " VCP_CITY_CODE = ?," +
-                    " VCP_AREA_CODE = ?," +
-                    " MODIFY_TIME = ?" +
-                    "WHERE " +
-                    "VBI_ID = ?";
-
-            sendToDb(sql, args);
-            return;
+        Location location = LocationParser.getInstance().parse(lngD, latD);
+        if (location != null) {
+            province = location.getProv();
+            city = location.getCity();
+            area = location.getDistrict();
+            provinceCode = location.getProvCode();
+            cityCode = location.getCityCode();
+            areaCode = location.getDistrictCode();
         }
 
-        log.warn("设备[{}]不存在!", terminalId);
+        Object[] args = new Object[]{lngD, latD, province, city, area,
+                provinceCode, cityCode, areaCode, new Date(time), new Date(), vehicleInfo.getId()};
+
+        String sql = "UPDATE veh_current_position " +
+                "SET " +
+                " VCP_SHIFT_LON = ?," +
+                " VCP_SHIFT_LAT = ?," +
+                " VCP_PROVINCE = ?," +
+                " VCP_CITY = ?," +
+                " VCP_AREA = ?, " +
+                " VCP_PROVINCE_CODE = ?," +
+                " VCP_CITY_CODE = ?," +
+                " VCP_AREA_CODE = ?," +
+                " VCP_GPS_TIME= ?," +
+                " MODIFY_TIME = ?" +
+                "WHERE " +
+                "VBI_ID = ?";
+
+        sendToDb(sql, args);
     }
 }

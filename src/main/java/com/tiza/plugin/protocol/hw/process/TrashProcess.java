@@ -4,11 +4,13 @@ import com.tiza.plugin.model.Header;
 import com.tiza.plugin.protocol.hw.HwDataProcess;
 import com.tiza.plugin.protocol.hw.model.HwHeader;
 import com.tiza.plugin.util.CommonUtil;
+import com.tiza.plugin.util.JacksonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +63,10 @@ public class TrashProcess extends HwDataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         HwHeader hwHeader = (HwHeader) header;
-        Map param = new HashMap();
+        String terminalId = hwHeader.getTerminalId();
+        Date gwTime = new Date(hwHeader.getTime());
 
+        Map param = new HashMap();
         int cmd = hwHeader.getCmd();
         ByteBuf buf = Unpooled.copiedBuffer(content);
         if (0x03 == cmd) {
@@ -82,9 +86,13 @@ public class TrashProcess extends HwDataProcess {
                 array[i] = buf.readByte();
             }
 
-            param.put("temp", temp);
+            param.put("temperature", temp);
             param.put("bins", array);
             hwHeader.setParamMap(param);
+
+            Object[] args = new Object[]{terminalId, temp, JacksonUtil.toJson(array), gwTime};
+            String sql = "INSERT INTO veh_work_param_log (TER_NO, TEMPERATURE, WORK_PARAM, GW_TIME) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, args);
 
             return;
         }
@@ -99,11 +107,16 @@ public class TrashProcess extends HwDataProcess {
 
             byte[] array = new byte[length];
             buf.readBytes(array);
-            String code = new String(array);
+            String authContent = new String(array);
 
             param.put("authType", authType);
-            param.put("code", code);
+            param.put("authContent", authContent);
             hwHeader.setParamMap(param);
+
+            Object[] args = new Object[]{terminalId, authType, authContent, gwTime};
+            String sql = "INSERT INTO veh_card_log (TER_NO, AUTH_TYPE, AUTH_CONTENT, GW_TIME) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, args);
+
             return;
         }
     }
@@ -147,7 +160,6 @@ public class TrashProcess extends HwDataProcess {
 
         return null;
     }
-
 
     public byte[] combine(byte[] content) {
         byte check = CommonUtil.sumCheck(content);

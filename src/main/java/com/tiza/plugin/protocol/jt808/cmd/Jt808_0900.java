@@ -1,5 +1,6 @@
 package com.tiza.plugin.protocol.jt808.cmd;
 
+import com.tiza.plugin.bean.VehicleInfo;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.Jt808Header;
 import com.tiza.plugin.protocol.hw.model.HwHeader;
@@ -7,8 +8,12 @@ import com.tiza.plugin.protocol.jt808.Jt808DataProcess;
 import com.tiza.plugin.util.CommonUtil;
 import com.tiza.plugin.util.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,16 +39,52 @@ public class Jt808_0900 extends Jt808DataProcess {
         }
         log.info("收到终端[{}]透传信息[{}] ... ", jt808Header.getTerminalId(), CommonUtil.bytesToStr(content));
 
+        String terminalId = jt808Header.getTerminalId();
         HwHeader hwHeader = (HwHeader) hwDataProcess.parseHeader(content);
-        if (hwHeader == null){
+        if (hwHeader != null) {
+            hwHeader.setTerminalId(terminalId);
+            hwHeader.setTime(jt808Header.getGwTime());
 
-            return;
+            hwDataProcess.parse(hwHeader.getContent(), hwHeader);
+            Map param = hwHeader.getParamMap();
+            if (param != null) {
+                // 写入 kafka 准备指令下发
+                param.put("id", hwHeader.getCmd());
+                sendToKafka(jt808Header, param);
+
+                // 更新当前表
+                updateVehicleInfo(hwHeader);
+            }
         }
-        hwDataProcess.parse(hwHeader.getContent(), hwHeader);
-        Map param = hwHeader.getParamMap();
-        param.put("id", hwHeader.getCmd());
+    }
 
-        // 写入 kafka 准备指令下发
-        sendToKafka(jt808Header, param);
+    public void updateVehicleInfo(HwHeader hwHeader) {
+        VehicleInfo vehicleInfo = (VehicleInfo) vehicleInfoProvider.get(hwHeader.getTerminalId());
+
+        String sql = "SELECT t.WORK_PARAM FROM veh_current_position t WHERE t.VBI_ID=" + vehicleInfo.getId();
+        String json = jdbcTemplate.queryForObject(sql, String.class);
+
+        // 工况参数
+        Map workMap = new HashMap();
+        try {
+            if (StringUtils.isNotEmpty(json)) {
+                workMap = JacksonUtil.toObject(json, HashMap.class);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 覆盖历史工况信息
+        workMap.putAll(hwHeader.getParamMap());
+
+        json = JacksonUtil.toJson(workMap);
+        Object[] args = new Object[]{json, new Date(), vehicleInfo.getId()};
+        sql = "UPDATE veh_current_position " +
+                "SET " +
+                " WORK_PARAM = ?," +
+                " MODIFY_TIME = ?" +
+                "WHERE " +
+                "VBI_ID = ?";
+
+        sendToDb(sql, args);
     }
 }

@@ -42,7 +42,7 @@ public class Jt808DataProcess implements IDataProcess {
     protected ICache vehicleInfoProvider;
 
     @Resource
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     @Resource
     private Producer kafkaProducer;
@@ -84,6 +84,12 @@ public class Jt808DataProcess implements IDataProcess {
         if (check != checkReady) {
 
             log.error("校验位验证失败，指令[{}]", CommonUtil.bytesToString(bytes));
+            return null;
+        }
+
+        if (!vehicleInfoProvider.containsKey(terminalId)) {
+            log.warn("设备[{}]不存在!", terminalId);
+
             return null;
         }
 

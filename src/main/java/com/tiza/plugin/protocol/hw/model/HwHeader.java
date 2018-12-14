@@ -16,6 +16,8 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class HwHeader extends Header {
 
+    private String terminalId;
+
     private byte[] startBytes;
 
     private int cmd;
@@ -27,4 +29,6 @@ public class HwHeader extends Header {
     private byte endByte;
 
     private Map paramMap;
+
+    private long time;
 }

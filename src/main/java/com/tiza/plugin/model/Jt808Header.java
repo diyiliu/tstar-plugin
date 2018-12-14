@@ -22,6 +22,7 @@ public class Jt808Header extends Header {
     private byte[] content = null;
     private byte check;
     private int packageCount;
-    // 下行指令ID
-    private int key;
+
+    // 网关时间
+    private long gwTime;
 }

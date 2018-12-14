@@ -1,7 +1,11 @@
 package com.tiza.plugin.protocol.hw;
 
+import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.IDataProcess;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.annotation.Resource;
 
 /**
  * Description: HwDataProcess
@@ -12,6 +16,12 @@ public class HwDataProcess implements IDataProcess {
 
     /** 1001: 垃圾箱; 1002: 垃圾袋 **/
     protected int dataType;
+
+    @Resource
+    protected ICache vehicleInfoProvider;
+
+    @Resource
+    protected JdbcTemplate jdbcTemplate;
 
     @Override
     public Header parseHeader(byte[] bytes) {

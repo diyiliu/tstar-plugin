@@ -14,4 +14,6 @@ public class VehicleInfo {
     private Long id;
 
     private String terminalId;
+
+    private String workParam;
 }
