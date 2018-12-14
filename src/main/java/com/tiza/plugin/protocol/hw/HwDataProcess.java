@@ -18,9 +18,6 @@ public class HwDataProcess implements IDataProcess {
     protected int dataType;
 
     @Resource
-    protected ICache vehicleInfoProvider;
-
-    @Resource
     protected JdbcTemplate jdbcTemplate;
 
     @Override

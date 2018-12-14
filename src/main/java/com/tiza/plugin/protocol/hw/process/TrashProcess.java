@@ -10,9 +10,7 @@ import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Description: TrashProcess
@@ -69,6 +67,7 @@ public class TrashProcess extends HwDataProcess {
         Map param = new HashMap();
         int cmd = hwHeader.getCmd();
         ByteBuf buf = Unpooled.copiedBuffer(content);
+
         if (0x03 == cmd) {
             int tempFlag = buf.readByte();
             double temp = CommonUtil.keepDecimal(buf.readShort(), 0.1, 1);
@@ -87,7 +86,7 @@ public class TrashProcess extends HwDataProcess {
             }
 
             param.put("temperature", temp);
-            param.put("bins", array);
+            param.put("binsRange", array);
             hwHeader.setParamMap(param);
 
             Object[] args = new Object[]{terminalId, temp, JacksonUtil.toJson(array), gwTime};
@@ -115,6 +114,72 @@ public class TrashProcess extends HwDataProcess {
 
             Object[] args = new Object[]{terminalId, authType, authContent, gwTime};
             String sql = "INSERT INTO veh_card_log (TER_NO, AUTH_TYPE, AUTH_CONTENT, GW_TIME) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, args);
+
+            return;
+        }
+
+        if (0x05 == cmd) {
+            int authType = buf.readByte();
+            int length = buf.readUnsignedByte();
+            if (buf.readableBytes() < length) {
+
+                log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
+            }
+
+            byte[] array = new byte[length];
+            buf.readBytes(array);
+            String authContent = new String(array);
+
+            int n = buf.readByte();
+            if (buf.readableBytes() < n * 6) {
+
+                log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
+            }
+
+            List list = new ArrayList();
+            for (int i = 0; i < n; i++) {
+
+                int weight = buf.readShort();
+                int before = buf.readShort();
+                int after = buf.readShort();
+
+                Map wMap = new HashMap();
+                wMap.put("weight", weight);
+                wMap.put("before", before);
+                wMap.put("after", after);
+                list.add(wMap);
+            }
+
+            param.put("authType", authType);
+            param.put("authContent", authContent);
+            param.put("binsWeight", list);
+            hwHeader.setParamMap(param);
+
+            Object[] args = new Object[]{terminalId, authType, authContent, n, JacksonUtil.toJson(list), gwTime};
+            String sql = "INSERT INTO veh_card_pick_log (TER_NO, AUTH_TYPE, AUTH_CONTENT, CHANNEL_COUNT, PICK_CONTENT, GW_TIME) VALUES (?, ?, ?, ?, ?, ?)";
+            jdbcTemplate.update(sql, args);
+
+            return;
+        }
+
+        if (0x06 == cmd) {
+            int n = buf.readByte();
+            if (buf.readableBytes() < n) {
+
+                log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
+            }
+
+            int[] array = new int[n];
+            for (int i = 0; i < n; i++) {
+                array[i] = buf.readByte();
+            }
+
+            param.put("binsFault", array);
+            hwHeader.setParamMap(param);
+
+            Object[] args = new Object[]{terminalId, n, JacksonUtil.toJson(array), gwTime};
+            String sql = "INSERT INTO veh_fault_log (TER_NO, CHANNEL_COUNT, FAULT_CONTENT, GW_TIME) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sql, args);
 
             return;
