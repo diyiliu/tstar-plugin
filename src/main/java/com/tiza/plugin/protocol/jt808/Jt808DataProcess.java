@@ -2,23 +2,16 @@ package com.tiza.plugin.protocol.jt808;
 
 import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Header;
+import com.tiza.plugin.model.IDataParse;
 import com.tiza.plugin.model.IDataProcess;
 import com.tiza.plugin.model.Jt808Header;
-import com.tiza.plugin.protocol.hw.HwDataProcess;
 import com.tiza.plugin.util.CommonUtil;
-import com.tiza.plugin.util.JacksonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Description: Jt808DataProcess
@@ -36,19 +29,7 @@ public class Jt808DataProcess implements IDataProcess {
     private ICache cmdCacheProvider;
 
     @Resource
-    protected HwDataProcess hwDataProcess;
-
-    @Resource
-    protected ICache vehicleInfoProvider;
-
-    @Resource
-    protected JdbcTemplate jdbcTemplate;
-
-    @Resource
-    private Producer kafkaProducer;
-
-    @Value("${kafka.send-topic}")
-    private String sendTopic;
+    protected IDataParse dataParse;
 
     @Override
     public Header parseHeader(byte[] bytes) {
@@ -69,7 +50,7 @@ public class Jt808DataProcess implements IDataProcess {
 
         byte[] array = new byte[6];
         buf.readBytes(array);
-        String terminalId = CommonUtil.bytesToStr(array);
+        String terminalId = CommonUtil.bytesToStr(array).replaceFirst("^0*", "");
 
         int serial = buf.readUnsignedShort();
 
@@ -84,12 +65,6 @@ public class Jt808DataProcess implements IDataProcess {
         if (check != checkReady) {
 
             log.error("校验位验证失败，指令[{}]", CommonUtil.bytesToString(bytes));
-            return null;
-        }
-
-        if (!vehicleInfoProvider.containsKey(terminalId)) {
-            log.warn("设备[{}]不存在!", terminalId);
-
             return null;
         }
 
@@ -116,35 +91,5 @@ public class Jt808DataProcess implements IDataProcess {
     public void init() {
 
         cmdCacheProvider.put(cmdId, this);
-    }
-
-    /**
-     * 写入 kafka
-     *
-     * @param header
-     * @param param
-     */
-    public void sendToKafka(Jt808Header header, Map param) {
-        String terminal = header.getTerminalId();
-
-        Map map = new HashMap();
-        map.put("terminal", terminal);
-        map.put("cmd", header.getCmd());
-        map.put("content", CommonUtil.bytesToStr(header.getContent()));
-        map.put("data", param);
-        map.put("timestamp", System.currentTimeMillis());
-
-        String json = JacksonUtil.toJson(map);
-        kafkaProducer.send(new KeyedMessage(sendTopic, terminal, json));
-    }
-
-    /**
-     * 写入数据库
-     *
-     * @param sql
-     */
-    public void sendToDb(String sql, Object... args) {
-
-        jdbcTemplate.update(sql, args);
     }
 }

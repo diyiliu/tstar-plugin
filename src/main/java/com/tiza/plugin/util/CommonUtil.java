@@ -633,9 +633,7 @@ public class CommonUtil {
      */
     public static byte[] decoderJt808Format(byte[] bytes) {
         String hex = CommonUtil.bytesToStr(bytes).toUpperCase();
-
-        hex.replaceAll("7D01", "7D");
-        hex.replaceAll("7D02", "7E");
+        hex = hex.replaceAll("7D01", "7D").replaceAll("7D02", "7E");
 
         byte[] array = CommonUtil.hexStringToBytes(hex);
 
@@ -655,9 +653,7 @@ public class CommonUtil {
      */
     public static byte[] encoderJt808Format(byte[] bytes) {
         String hex = CommonUtil.bytesToStr(bytes).toUpperCase();
-
-        hex.replaceAll("7D", "7D01");
-        hex.replaceAll("7E", "7D02");
+        hex = hex.replaceAll("7D", "7D01").replaceAll("7E", "7D02");
 
         byte[] array = CommonUtil.hexStringToBytes(hex);
 

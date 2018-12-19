@@ -15,5 +15,7 @@ public class VehicleInfo {
 
     private String terminalId;
 
+    private Integer vehType;
+
     private String workParam;
 }

@@ -2,9 +2,9 @@ package com.tiza.plugin.protocol.jt808.cmd;
 
 import cn.com.tiza.earth4j.LocationParser;
 import cn.com.tiza.earth4j.entry.Location;
-import com.tiza.plugin.bean.VehicleInfo;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.Jt808Header;
+import com.tiza.plugin.model.Position;
 import com.tiza.plugin.protocol.jt808.Jt808DataProcess;
 import com.tiza.plugin.util.CommonUtil;
 import com.tiza.plugin.util.DateUtil;
@@ -61,42 +61,24 @@ public class Jt808_0200 extends Jt808DataProcess {
         log.info("收到终端[{}]位置信息[{}, {}, {}] ... ", jt808Header.getTerminalId(),
                 DateUtil.dateToString(new Date(time)), lat, lng);
 
-        String terminalId = jt808Header.getTerminalId();
-        VehicleInfo vehicleInfo = (VehicleInfo) vehicleInfoProvider.get(terminalId);
-
         double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
         double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
-        String province = null, city = null, area = null;
-        String provinceCode = null, cityCode = null, areaCode = null;
+
+        Position position = new Position();
+        position.setLng(lngD);
+        position.setLat(latD);
+        position.setTime(time);
 
         Location location = LocationParser.getInstance().parse(lngD, latD);
         if (location != null) {
-            province = location.getProv();
-            city = location.getCity();
-            area = location.getDistrict();
-            provinceCode = location.getProvCode();
-            cityCode = location.getCityCode();
-            areaCode = location.getDistrictCode();
+            position.setProvince(location.getProv());
+            position.setCity(location.getCity());
+            position.setArea(location.getDistrict());
+            position.setProCode( location.getProvCode());
+            position.setCityCode(location.getCityCode());
+            position.setAreaCode(location.getDistrictCode());
         }
 
-        Object[] args = new Object[]{lngD, latD, province, city, area,
-                provinceCode, cityCode, areaCode, new Date(time), new Date(), vehicleInfo.getId()};
-
-        String sql = "UPDATE veh_current_position " +
-                "SET " +
-                " VCP_SHIFT_LON = ?," +
-                " VCP_SHIFT_LAT = ?," +
-                " VCP_PROVINCE = ?," +
-                " VCP_CITY = ?," +
-                " VCP_AREA = ?, " +
-                " VCP_PROVINCE_CODE = ?," +
-                " VCP_CITY_CODE = ?," +
-                " VCP_AREA_CODE = ?," +
-                " VCP_GPS_TIME= ?," +
-                " MODIFY_TIME = ?" +
-                "WHERE " +
-                "VBI_ID = ?";
-
-        sendToDb(sql, args);
+        dataParse.dealPosition(header, position);
     }
 }
