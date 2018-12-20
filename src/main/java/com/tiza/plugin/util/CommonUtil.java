@@ -252,9 +252,8 @@ public class CommonUtil {
         return decimal.doubleValue();
     }
 
-    public static String parseBytes(byte[] array, int offset, int lenght) {
-
-        ByteBuf buf = Unpooled.copiedBuffer(array, offset, lenght);
+    public static String parseBytes(byte[] array, int offset, int length) {
+        ByteBuf buf = Unpooled.copiedBuffer(array, offset, length);
 
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
