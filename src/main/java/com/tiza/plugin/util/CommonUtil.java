@@ -148,17 +148,13 @@ public class CommonUtil {
 
 
     public static byte[] longToBytes(long number, int length) {
-
         long temp = number;
 
         byte[] bytes = new byte[length];
-
         for (int i = bytes.length - 1; i > -1; i--) {
 
             bytes[i] = new Long(temp & 0xff).byteValue();
-
             temp = temp >> 8;
-
         }
 
         return bytes;
@@ -339,6 +335,11 @@ public class CommonUtil {
         if (str.length() < length) {
             str = String.format("%0" + (length - str.length()) + "d", 0) + str;
         }
+
+        if (str.length() > length){
+            str = str.substring(0, length);
+        }
+
         byte[] bytes = hexStringToBytes(str);
 
         return bytes;

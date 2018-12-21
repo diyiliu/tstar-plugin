@@ -1,9 +1,11 @@
 package com.tiza.plugin.util;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 /**
  * Description: JacksonUtil
@@ -14,10 +16,23 @@ public class JacksonUtil {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
+    static {
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        // 忽略未知字段
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // null 转为空字符串
+        mapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>() {
+            @Override
+            public void serialize(Object o, JsonGenerator jsonGenerator,
+                                  SerializerProvider serializerProvider) throws IOException {
+
+                jsonGenerator.writeString("");
+            }
+        });
+    }
+
     public static String toJson(Object obj){
-
         String rs = null;
-
         try {
             rs = mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
