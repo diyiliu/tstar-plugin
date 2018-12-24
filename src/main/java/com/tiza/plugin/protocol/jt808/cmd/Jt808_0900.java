@@ -24,10 +24,6 @@ public class Jt808_0900 extends Jt808DataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         Jt808Header jt808Header = (Jt808Header) header;
-        if (content.length < 9) {
-            log.error("数据长度不足: [{}]", CommonUtil.bytesToStr(content));
-            return;
-        }
         log.info("收到终端[{}]透传信息[{}] ... ", jt808Header.getTerminalId(), CommonUtil.bytesToStr(content));
 
         dataParse.detach(header, content);

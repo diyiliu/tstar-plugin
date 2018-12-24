@@ -336,10 +336,6 @@ public class CommonUtil {
             str = String.format("%0" + (length - str.length()) + "d", 0) + str;
         }
 
-        if (str.length() > length){
-            str = str.substring(0, length);
-        }
-
         byte[] bytes = hexStringToBytes(str);
 
         return bytes;
