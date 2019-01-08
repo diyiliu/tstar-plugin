@@ -31,15 +31,10 @@ public class TestMain {
 
     @Test
     public void test2(){
-        String str = "68 00 68 04 13 01 11 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37";
+        String str = "68 00 68 07 1A 02 18 51 46 4C 59 30 31 30 30 30 30 30 30 30 30 30 30 30 30 30 33 32 74 6C 33";
         byte[] bytes = CommonUtil.hexStringToBytes(str);
 
-        System.out.println(CommonUtil.sumCheck(bytes));
-
-
-        str = "72";
-        bytes = CommonUtil.hexStringToBytes(str);
-        System.out.println(bytes[0]);
+        System.out.println(String.format("%02X", CommonUtil.sumCheck(bytes)));
     }
 
     @Test
