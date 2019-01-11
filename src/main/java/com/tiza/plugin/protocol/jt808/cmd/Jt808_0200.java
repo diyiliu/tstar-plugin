@@ -65,8 +65,8 @@ public class Jt808_0200 extends Jt808DataProcess {
         double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
 
         Position position = new Position();
-        position.setLng(lngD);
-        position.setLat(latD);
+        position.setEnLng(lngD);
+        position.setEnLat(latD);
         position.setTime(time);
 
         Location location = LocationParser.getInstance().parse(lngD, latD);
