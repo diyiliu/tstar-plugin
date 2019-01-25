@@ -8,6 +8,7 @@ import com.tiza.plugin.model.Position;
 import com.tiza.plugin.protocol.jt808.Jt808DataProcess;
 import com.tiza.plugin.util.CommonUtil;
 import com.tiza.plugin.util.DateUtil;
+import com.tiza.plugin.util.GpsCorrectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
@@ -64,9 +65,13 @@ public class Jt808_0200 extends Jt808DataProcess {
         double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
         double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
 
+        double[] enLatLng =  GpsCorrectUtil.wgs84_To_Gcj02(latD, lngD);
+
         Position position = new Position();
-        position.setEnLng(lngD);
-        position.setEnLat(latD);
+        position.setLat(latD);
+        position.setLng(lngD);
+        position.setEnLat(enLatLng[0]);
+        position.setEnLng(enLatLng[1]);
         position.setTime(time);
 
         Location location = LocationParser.getInstance().parse(lngD, latD);
