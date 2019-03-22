@@ -54,7 +54,7 @@ public class TestMain {
     @Test
     public void test4(){
 
-        String str = "30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30".replaceAll(" ", "");
+        String str = "4C 56 39 30 42 57 37 53 37 4A 32 4C 44 4B 33 32 30".replaceAll(" ", "");
         System.out.println(str);
         byte[] bytes = CommonUtil.hexStringToBytes(str);
         System.out.println(bytes.length);

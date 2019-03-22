@@ -17,9 +17,7 @@ public class Gb32960Header extends Header{
     private int resp;
     private int length;
     private String vin;
-    private String terminalId;
-    private int serial;
-    private byte[] content = null;
+    private byte[] content = new byte[0];
     private int check;
 
     private long gwTime;

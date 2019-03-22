@@ -1,6 +1,7 @@
 package com.tiza.plugin.util;
 
 import com.tiza.plugin.cache.ICache;
+import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Jt808Header;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -762,6 +763,64 @@ public class CommonUtil {
 
         // 添加标识位
         return CommonUtil.jt808HeaderToBytes(header);
+    }
+
+    /**
+     * 消息头（消息头 + 消息体）
+     *
+     * @param header
+     * @return
+     */
+    public static byte[] gb32960HeaderToContent(Gb32960Header header) {
+        int length = header.getLength();
+
+        ByteBuf buf = Unpooled.buffer(22 + length);
+        buf.writeByte(header.getCmd());
+        buf.writeByte(header.getResp());
+        buf.writeBytes(header.getVin().getBytes());
+        buf.writeByte(0x01);
+        buf.writeShort(length);
+        buf.writeBytes(header.getContent());
+
+        return buf.array();
+    }
+
+
+    /**
+     * gb32960Header to bytes 下发指令
+     *
+     * @param header
+     * @return
+     */
+    public static byte[] gb32960HeaderToBytes(Gb32960Header header) {
+        byte[] bytes = gb32960HeaderToContent(header);
+        byte check = CommonUtil.getCheck(bytes);
+
+        return Unpooled.copiedBuffer(new byte[]{0x23, 0x23}, bytes, new byte[]{check}).array();
+    }
+
+
+    /**
+     * 生成 gb32960 指令内容
+     *
+     * @param vin      设备 vin
+     * @param content  需要下行的指令内容
+     * @param cmd      需要下行的命令ID
+     * @return
+     */
+    public static byte[] gb32960Response(String vin, byte[] content, int cmd, boolean resp) {
+        // 消息体长度
+        int length = content.length;
+
+        Gb32960Header header = new Gb32960Header();
+        header.setResp(resp? 0x01: 0xFE);
+        header.setLength(length);
+        header.setVin(vin);
+        header.setContent(content);
+        header.setCmd(cmd);
+
+        // 添加标识位
+        return CommonUtil.gb32960HeaderToBytes(header);
     }
 
     /**
