@@ -21,4 +21,6 @@ public class Gb32960Header extends Header{
     private int serial;
     private byte[] content = null;
     private int check;
+
+    private long gwTime;
 }
