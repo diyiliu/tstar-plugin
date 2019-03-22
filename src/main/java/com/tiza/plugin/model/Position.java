@@ -10,6 +10,8 @@ import lombok.Data;
 
 @Data
 public class Position {
+    private int status;
+
     private long time;
 
     private double lng;

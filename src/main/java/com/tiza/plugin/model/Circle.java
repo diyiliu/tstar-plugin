@@ -1,5 +1,7 @@
 package com.tiza.plugin.model;
 
+import com.tiza.plugin.model.facade.Area;
+
 /**
  * Description: Circle
  * Author: DIYILIU

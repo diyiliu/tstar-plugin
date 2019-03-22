@@ -1,4 +1,4 @@
-package com.tiza.plugin.model;
+package com.tiza.plugin.model.facade;
 
 /**
  * Description: ITask

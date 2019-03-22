@@ -1,8 +1,11 @@
 import com.tiza.plugin.util.CommonUtil;
 import com.tiza.plugin.util.DateUtil;
+import com.tiza.plugin.util.JacksonUtil;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description: TestMain
@@ -39,12 +42,35 @@ public class TestMain {
 
     @Test
     public void test3(){
-        String str = "02 00 00 7d 02 01 81 70 21 80 74 00 08 00 00 00 00 00 00 00 03 01 ae 93 8a 06 ba 81 04 00 00 00 00 00 8e 18 12 18 11 20 52 30 01 1a 31 01 06 d0 04 00 00 00 00 d4 01 3c e1 02 01 83 e2 21 54 5a 43 53 2d 31 2e 31 33 2e 31 30 39 2e 34 20 31 37 2d 31 32 2d 32 38 2c 4d 54 30 33 5f 50 31 30 e3 0f 34 36 30 30 32 31 39 35 38 33 34 34 34 37 32 e4 13 01 cc 00 00 74 7c f6 07 33 73 a1 29 36 1f 74 7c a8 40 15 e5 04 01 2c";
+        String str = "68 00 68 3c 05 27 33 26 c3 01";
         byte[] bytes = CommonUtil.hexStringToBytes(str);
 
 
         System.out.println(bytes.length);
 
-        System.out.println(CommonUtil.getCheck(bytes));
+        System.out.println(String.format("%02X", CommonUtil.sumCheck(bytes)));
+    }
+
+    @Test
+    public void test4(){
+
+        String str = "30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30".replaceAll(" ", "");
+        System.out.println(str);
+        byte[] bytes = CommonUtil.hexStringToBytes(str);
+        System.out.println(bytes.length);
+
+        System.out.println(new String(bytes));
+    }
+
+    @Test
+    public void test5() {
+        Map map = new HashMap() {
+            {
+                this.put("a", 123);
+            }
+        };
+
+        String str = JacksonUtil.toJson(map);
+        System.out.println(str);
     }
 }

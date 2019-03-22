@@ -1,4 +1,6 @@
-package com.tiza.plugin.model;
+package com.tiza.plugin.model.facade;
+
+import com.tiza.plugin.model.Header;
 
 /**
  * Description: IDataProcess

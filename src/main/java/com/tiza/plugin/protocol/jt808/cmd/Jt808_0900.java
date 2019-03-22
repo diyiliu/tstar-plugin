@@ -1,5 +1,6 @@
 package com.tiza.plugin.protocol.jt808.cmd;
 
+import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.Jt808Header;
 import com.tiza.plugin.protocol.jt808.Jt808DataProcess;
@@ -26,6 +27,13 @@ public class Jt808_0900 extends Jt808DataProcess {
         Jt808Header jt808Header = (Jt808Header) header;
         log.info("收到终端[{}]透传信息[{}] ... ", jt808Header.getTerminalId(), CommonUtil.bytesToStr(content));
 
-        dataParse.detach(header, content);
+        DeviceData deviceData = new DeviceData();
+        deviceData.setDeviceId(jt808Header.getTerminalId());
+        deviceData.setCmdId(cmdId);
+        deviceData.setTime(jt808Header.getGwTime());
+        deviceData.setBytes(content);
+
+        // 子协议解析
+        dataParse.detach(deviceData);
     }
 }

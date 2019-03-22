@@ -99,6 +99,21 @@ public class CommonUtil {
     }
 
     /**
+     * 读取时间
+     * 年月日
+     * 年月日 + 时分秒
+     * @param buf
+     * @param length (3或6)
+     * @return
+     */
+    public static Date getBufDate(ByteBuf buf, int length){
+        byte[] dateBytes = new byte[length];
+        buf.readBytes(dateBytes);
+
+       return CommonUtil.bytesToDate(dateBytes);
+    }
+
+    /**
      * @param date
      * @param bytes
      * @return
@@ -772,7 +787,7 @@ public class CommonUtil {
      *
      * @param itemCache
      */
-    public static void refrechCach(Set oldKeys, Set tempKeys, ICache itemCache) {
+    public static void refreshCache(Set oldKeys, Set tempKeys, ICache itemCache) {
         Collection subKeys = CollectionUtils.subtract(oldKeys, tempKeys);
         for (Iterator iterator = subKeys.iterator(); iterator.hasNext(); ) {
             itemCache.remove(iterator.next());

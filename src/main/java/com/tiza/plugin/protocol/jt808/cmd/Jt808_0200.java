@@ -84,6 +84,6 @@ public class Jt808_0200 extends Jt808DataProcess {
             position.setAreaCode(location.getDistrictCode());
         }
 
-        dataParse.dealPosition(header, position);
+        dataParse.dealPosition(jt808Header.getTerminalId(), position);
     }
 }

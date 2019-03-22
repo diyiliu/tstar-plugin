@@ -1,6 +1,6 @@
 package com.tiza.plugin.listener;
 
-import com.tiza.plugin.model.IDataProcess;
+import com.tiza.plugin.model.facade.IDataProcess;
 import com.tiza.plugin.util.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEvent;

@@ -2,9 +2,9 @@ package com.tiza.plugin.protocol.jt808;
 
 import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Header;
-import com.tiza.plugin.model.IDataParse;
-import com.tiza.plugin.model.IDataProcess;
 import com.tiza.plugin.model.Jt808Header;
+import com.tiza.plugin.model.facade.IDataParse;
+import com.tiza.plugin.model.facade.IDataProcess;
 import com.tiza.plugin.util.CommonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

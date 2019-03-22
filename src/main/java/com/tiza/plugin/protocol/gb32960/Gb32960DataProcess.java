@@ -1,7 +1,7 @@
 package com.tiza.plugin.protocol.gb32960;
 
 import com.tiza.plugin.model.Header;
-import com.tiza.plugin.model.IDataProcess;
+import com.tiza.plugin.model.facade.IDataProcess;
 
 /**
  * Description: Gb32960DataProcess
