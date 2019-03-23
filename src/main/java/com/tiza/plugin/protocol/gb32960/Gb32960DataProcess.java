@@ -1,6 +1,8 @@
 package com.tiza.plugin.protocol.gb32960;
 
+import cn.com.tiza.tstar.common.process.BaseHandle;
 import com.tiza.plugin.cache.ICache;
+import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.facade.IDataParse;
@@ -28,6 +30,8 @@ public class Gb32960DataProcess implements IDataProcess {
 
     @Resource
     protected IDataParse dataParse;
+
+    private BaseHandle tstarHandle;
 
     @Override
     public Header parseHeader(byte[] bytes) {
@@ -72,5 +76,29 @@ public class Gb32960DataProcess implements IDataProcess {
     @Override
     public void init() {
         cmdCacheProvider.put(cmdId, this);
+    }
+
+    public BaseHandle getTstarHandle() {
+        return tstarHandle;
+    }
+
+    public void setTstarHandle(BaseHandle tstarHandle) {
+        this.tstarHandle = tstarHandle;
+    }
+
+    /**
+     * 构造下游数据
+     *
+     * @param header
+     * @return
+     */
+    protected DeviceData buildData(Gb32960Header header){
+        DeviceData deviceData = new DeviceData();
+        deviceData.setDeviceId(header.getVin());
+        deviceData.setCmdId(header.getCmd());
+        deviceData.setTime(header.getGwTime());
+        deviceData.setBytes(header.getContent());
+
+        return deviceData;
     }
 }

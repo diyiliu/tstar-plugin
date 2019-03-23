@@ -1,5 +1,6 @@
 package com.tiza.plugin.model.facade;
 
+import cn.com.tiza.tstar.common.process.BaseHandle;
 import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Position;
 
@@ -17,6 +18,8 @@ public interface IDataParse {
     void dealData(DeviceData deviceData, Map param, String type);
 
     void dealPosition(String deviceId, Position position);
+
+    void dealWithTStar(DeviceData deviceData, BaseHandle handle);
 
     void sendToDb(String sql, Object... args);
 }

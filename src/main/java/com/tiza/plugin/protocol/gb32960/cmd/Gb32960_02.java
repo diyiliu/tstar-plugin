@@ -1,10 +1,12 @@
 package com.tiza.plugin.protocol.gb32960.cmd;
 
+import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.Position;
 import com.tiza.plugin.protocol.gb32960.Gb32960DataProcess;
 import com.tiza.plugin.util.CommonUtil;
+import com.tiza.plugin.util.GpsCorrectUtil;
 import com.tiza.plugin.util.JacksonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -16,7 +18,7 @@ import java.util.*;
 
 /**
  * 实时信息上报
- *
+ * <p>
  * Description: Gb32960_02
  * Author: DIYILIU
  * Update: 2019-03-18 16:57
@@ -118,8 +120,10 @@ public class Gb32960_02 extends Gb32960DataProcess {
             return;
         }
 
-        // 处理位置信息
-        // updateGpsInfo(gb32960Header, paramValues);
+        // 处理实时上报数据
+        DeviceData deviceData = buildData(gb32960Header);
+        deviceData.setDataBody(paramValues);
+        dataParse.detach(deviceData);
 
         // 0x03为补发数据
         if (0x02 == gb32960Header.getCmd()) {
@@ -524,7 +528,6 @@ public class Gb32960_02 extends Gb32960DataProcess {
 
             return true;
         }
-
         int status = byteBuf.readByte();
 
         //0:有效;1:无效
@@ -539,6 +542,13 @@ public class Gb32960_02 extends Gb32960DataProcess {
         position.setStatus(effective);
         position.setLng(CommonUtil.keepDecimal(lng * (lngDir == 0 ? 1 : -1), 0.000001, 6));
         position.setLat(CommonUtil.keepDecimal(lat * (latDir == 0 ? 1 : -1), 0.000001, 6));
+
+        double[] enLatLng =  GpsCorrectUtil.transform(position.getLat(), position.getLng());
+        position.setEnLat(enLatLng[0]);
+        position.setEnLng(enLatLng[1]);
+
+        // 逆地址解析
+        CommonUtil.mountPosition(position, position.getEnLng(), position.getEnLat());
 
         Map map = new HashMap();
         map.put("position", position);

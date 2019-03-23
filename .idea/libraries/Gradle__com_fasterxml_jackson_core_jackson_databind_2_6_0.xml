@@ -1,7 +1,6 @@
 <component name="libraryTable">
   <library name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.6.0">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/Could not resolve com.fasterxml.jackson.core:jackson-databind:2.6.0." />
       <root url="jar://$MAVEN_REPOSITORY$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.6.0/d2e494b027c26edc4d4e7e9251e168e6af26d2d3/jackson-databind-2.6.0.jar!/" />
     </CLASSES>
     <JAVADOC />

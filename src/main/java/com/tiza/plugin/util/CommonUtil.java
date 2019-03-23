@@ -1,8 +1,11 @@
 package com.tiza.plugin.util;
 
+import cn.com.tiza.earth4j.LocationParser;
+import cn.com.tiza.earth4j.entry.Location;
 import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Jt808Header;
+import com.tiza.plugin.model.Position;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.apache.commons.collections.CollectionUtils;
@@ -25,6 +28,26 @@ import java.util.regex.Pattern;
  */
 public class CommonUtil {
 
+
+    /**
+     * 解析省市区(TStar 工具)
+     *
+     * @param position
+     * @param lng
+     * @param lat
+     */
+    public static void mountPosition(Position position, double lng, double lat){
+        Location location = LocationParser.getInstance().parse(lng, lat);
+
+        if (location != null) {
+            position.setProvince(location.getProv());
+            position.setCity(location.getCity());
+            position.setArea(location.getDistrict());
+            position.setProCode( location.getProvCode());
+            position.setCityCode(location.getCityCode());
+            position.setAreaCode(location.getDistrictCode());
+        }
+    }
 
     public static boolean isEmpty(String str) {
 
@@ -103,15 +126,16 @@ public class CommonUtil {
      * 读取时间
      * 年月日
      * 年月日 + 时分秒
+     *
      * @param buf
      * @param length (3或6)
      * @return
      */
-    public static Date getBufDate(ByteBuf buf, int length){
+    public static Date getBufDate(ByteBuf buf, int length) {
         byte[] dateBytes = new byte[length];
         buf.readBytes(dateBytes);
 
-       return CommonUtil.bytesToDate(dateBytes);
+        return CommonUtil.bytesToDate(dateBytes);
     }
 
     /**
@@ -803,9 +827,9 @@ public class CommonUtil {
     /**
      * 生成 gb32960 指令内容
      *
-     * @param vin      设备 vin
-     * @param content  需要下行的指令内容
-     * @param cmd      需要下行的命令ID
+     * @param vin     设备 vin
+     * @param content 需要下行的指令内容
+     * @param cmd     需要下行的命令ID
      * @return
      */
     public static byte[] gb32960Response(String vin, byte[] content, int cmd, boolean resp) {
@@ -813,7 +837,7 @@ public class CommonUtil {
         int length = content.length;
 
         Gb32960Header header = new Gb32960Header();
-        header.setResp(resp? 0x01: 0xFE);
+        header.setResp(resp ? 0x01 : 0xFE);
         header.setLength(length);
         header.setVin(vin);
         header.setContent(content);
@@ -843,7 +867,6 @@ public class CommonUtil {
      *
      * @param oldKeys
      * @param tempKeys
-     *
      * @param itemCache
      */
     public static void refreshCache(Set oldKeys, Set tempKeys, ICache itemCache) {
@@ -851,5 +874,41 @@ public class CommonUtil {
         for (Iterator iterator = subKeys.iterator(); iterator.hasNext(); ) {
             itemCache.remove(iterator.next());
         }
+    }
+
+
+    /**
+     * gb32960 参数设置长度
+     *
+     * @param id
+     * @return
+     */
+    public static byte[] gb32960SetParam(int id, String value) {
+        if (0x01 == id || 0x02 == id || 0x03 == id ||
+                0x06 == id || 0x0A == id || 0x0B == id || 0x0F == id) {
+
+            return CommonUtil.longToBytes(Long.valueOf(value), 2);
+        }
+
+        if (0x04 == id || 0x09 == id || 0x0C == id ||
+                0x0D == id || 0x10 == id) {
+
+            return new byte[]{Byte.valueOf(value)};
+        }
+
+        if (0x07 == id || 0x08 == id) {
+            byte[] bytes = new byte[5];
+            byte[] src = value.getBytes();
+            System.arraycopy(src, 0, bytes, 0, src.length);
+
+            return bytes;
+        }
+
+        if (0x05 == id || 0x0E == id) {
+
+            return value.getBytes();
+        }
+
+        return new byte[0];
     }
 }

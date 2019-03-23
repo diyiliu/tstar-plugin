@@ -10,15 +10,13 @@ import lombok.Data;
 
 @Data
 public class Position {
-    private int status;
+    private Long time;
 
-    private long time;
+    private Double lng;
+    private Double lat;
 
-    private double lng;
-    private double lat;
-
-    private double enLng;
-    private double enLat;
+    private Double enLng;
+    private Double enLat;
 
     private String province;
     private String city;
@@ -27,4 +25,8 @@ public class Position {
     private String proCode;
     private String cityCode;
     private String areaCode;
+
+    private Integer status;
+
+    private Double speed;
 }

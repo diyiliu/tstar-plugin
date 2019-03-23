@@ -1,7 +1,5 @@
 package com.tiza.plugin.protocol.jt808.cmd;
 
-import cn.com.tiza.earth4j.LocationParser;
-import cn.com.tiza.earth4j.entry.Location;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.Jt808Header;
 import com.tiza.plugin.model.Position;
@@ -65,7 +63,7 @@ public class Jt808_0200 extends Jt808DataProcess {
         double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
         double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
 
-        double[] enLatLng =  GpsCorrectUtil.wgs84_To_Gcj02(latD, lngD);
+        double[] enLatLng =  GpsCorrectUtil.transform(latD, lngD);
 
         Position position = new Position();
         position.setLat(latD);
@@ -74,15 +72,7 @@ public class Jt808_0200 extends Jt808DataProcess {
         position.setEnLng(enLatLng[1]);
         position.setTime(time);
 
-        Location location = LocationParser.getInstance().parse(lngD, latD);
-        if (location != null) {
-            position.setProvince(location.getProv());
-            position.setCity(location.getCity());
-            position.setArea(location.getDistrict());
-            position.setProCode( location.getProvCode());
-            position.setCityCode(location.getCityCode());
-            position.setAreaCode(location.getDistrictCode());
-        }
+        CommonUtil.mountPosition(position, position.getEnLng(), position.getEnLat());
 
         dataParse.dealPosition(jt808Header.getTerminalId(), position);
     }

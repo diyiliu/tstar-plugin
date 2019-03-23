@@ -18,4 +18,6 @@ public class DeviceData {
     private Long time;
 
     private byte[] bytes = new byte[0];
+
+    private Object dataBody;
 }

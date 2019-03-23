@@ -1,5 +1,6 @@
 package com.tiza.plugin.model.adapter;
 
+import cn.com.tiza.tstar.common.process.BaseHandle;
 import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Position;
 import com.tiza.plugin.model.facade.IDataParse;
@@ -30,7 +31,15 @@ public class DataParseAdapter implements IDataParse {
     }
 
     @Override
+    public void dealWithTStar(DeviceData deviceData, BaseHandle handle) {
+
+
+    }
+
+    @Override
     public void sendToDb(String sql, Object... args) {
 
     }
+
+
 }
