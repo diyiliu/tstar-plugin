@@ -5,8 +5,6 @@ import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Position;
 import com.tiza.plugin.model.facade.IDataParse;
 
-import java.util.Map;
-
 /**
  * Description: DataParseAdapter
  * Author: DIYILIU
@@ -14,14 +12,8 @@ import java.util.Map;
  */
 public class DataParseAdapter implements IDataParse {
 
-
     @Override
     public void detach(DeviceData deviceData) {
-
-    }
-
-    @Override
-    public void dealData(DeviceData deviceData, Map param, String type) {
 
     }
 

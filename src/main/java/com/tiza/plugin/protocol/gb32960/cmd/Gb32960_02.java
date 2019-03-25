@@ -18,7 +18,7 @@ import java.util.*;
 
 /**
  * 实时信息上报
- * <p>
+ *
  * Description: Gb32960_02
  * Author: DIYILIU
  * Update: 2019-03-18 16:57
@@ -115,25 +115,23 @@ public class Gb32960_02 extends Gb32960DataProcess {
 
         // 舍弃空包
         if (paramValues.size() < 1 && !paramValues.contains("position")) {
-
             log.info("终端[{}]不处理空包数据[{}]!", gb32960Header.getVin(), JacksonUtil.toJson(paramValues));
             return;
         }
 
         // 处理实时上报数据
         DeviceData deviceData = buildData(gb32960Header);
-        deviceData.setDataBody(paramValues);
-        dataParse.detach(deviceData);
 
-        // 0x03为补发数据
-        if (0x02 == gb32960Header.getCmd()) {
-            // 车辆实时状态
-            if (MapUtils.isNotEmpty(realMode)) {
-
-            }
+        // 车辆实时状态 (忽略补发数据 0x03)
+        if (MapUtils.isNotEmpty(realMode) && 0x02 == gb32960Header.getCmd()) {
+            deviceData.setDataBody(realMode);
+            dataParse.detach(deviceData);
         }
-    }
 
+        // 车辆工况数据处理
+        deviceData.setDataBody(paramValues);
+        dataParse.dealWithTStar(deviceData, getTstarHandle());
+    }
 
     /**
      * 整车数据
@@ -543,7 +541,7 @@ public class Gb32960_02 extends Gb32960DataProcess {
         position.setLng(CommonUtil.keepDecimal(lng * (lngDir == 0 ? 1 : -1), 0.000001, 6));
         position.setLat(CommonUtil.keepDecimal(lat * (latDir == 0 ? 1 : -1), 0.000001, 6));
 
-        double[] enLatLng =  GpsCorrectUtil.transform(position.getLat(), position.getLng());
+        double[] enLatLng = GpsCorrectUtil.transform(position.getLat(), position.getLng());
         position.setEnLat(enLatLng[0]);
         position.setEnLng(enLatLng[1]);
 

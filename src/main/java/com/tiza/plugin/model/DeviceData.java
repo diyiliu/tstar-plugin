@@ -19,5 +19,7 @@ public class DeviceData {
 
     private byte[] bytes = new byte[0];
 
+    private String dataType;
+
     private Object dataBody;
 }
