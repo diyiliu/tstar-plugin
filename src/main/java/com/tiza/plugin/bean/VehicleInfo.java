@@ -18,4 +18,13 @@ public class VehicleInfo {
     private Integer vehType;
 
     private String workParam;
+
+    private String iccid;
+
+    private String license;
+
+    /** 最新时间 **/
+    private Long datetime;
+
+    private Integer status;
 }
