@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
+ * 平台登入
  * Description: Gb32960_05
  * Author: DIYILIU
  * Update: 2019-03-18 16:57

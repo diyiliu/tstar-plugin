@@ -18,7 +18,6 @@ import java.util.*;
 
 /**
  * 实时信息上报
- *
  * Description: Gb32960_02
  * Author: DIYILIU
  * Update: 2019-03-18 16:57
@@ -39,6 +38,7 @@ public class Gb32960_02 extends Gb32960DataProcess {
 
         // 数据采集时间
         Date date = CommonUtil.getBufDate(buf, 6);
+        gb32960Header.setDataTime(date.getTime());
 
         List paramValues = new ArrayList();
         Map map = new HashMap();
@@ -119,16 +119,14 @@ public class Gb32960_02 extends Gb32960DataProcess {
             return;
         }
 
-        // 处理实时上报数据
-        DeviceData deviceData = buildData(gb32960Header);
 
         // 车辆实时状态 (忽略补发数据 0x03)
         if (MapUtils.isNotEmpty(realMode) && 0x02 == gb32960Header.getCmd()) {
-            deviceData.setDataBody(realMode);
-            dataParse.detach(deviceData);
+            dataParse.detach(buildData(gb32960Header, "realMode", realMode));
         }
 
         // 车辆工况数据处理
+        DeviceData deviceData = buildData(gb32960Header);
         deviceData.setDataBody(paramValues);
         dataParse.dealWithTStar(deviceData, getTstarHandle());
     }

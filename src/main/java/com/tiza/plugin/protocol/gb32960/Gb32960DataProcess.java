@@ -92,12 +92,20 @@ public class Gb32960DataProcess implements IDataProcess {
      * @param header
      * @return
      */
-    protected DeviceData buildData(Gb32960Header header){
+    protected DeviceData buildData(Gb32960Header header) {
         DeviceData deviceData = new DeviceData();
         deviceData.setDeviceId(header.getVin());
         deviceData.setCmdId(header.getCmd());
-        deviceData.setTime(header.getGwTime());
+        deviceData.setTime(header.getDataTime() > 0 ? header.getDataTime() : header.getGwTime());
         deviceData.setBytes(header.getContent());
+
+        return deviceData;
+    }
+
+    protected DeviceData buildData(Gb32960Header header, String type, Object data) {
+        DeviceData deviceData = buildData(header);
+        deviceData.setDataType(type);
+        deviceData.setDataBody(data);
 
         return deviceData;
     }

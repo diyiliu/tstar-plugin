@@ -20,5 +20,8 @@ public class Gb32960Header extends Header{
     private byte[] content = new byte[0];
     private int check;
 
+    /** 网关时间 **/
     private long gwTime;
+    /** 数据时间 **/
+    private long dataTime;
 }

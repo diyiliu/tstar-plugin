@@ -5,7 +5,6 @@ import com.tiza.plugin.protocol.gb32960.Gb32960DataProcess;
 
 /**
  * 车载终端控制命令
- *
  * Description: Gb32960_82
  * Author: DIYILIU
  * Update: 2019-03-25 11:39
@@ -18,7 +17,6 @@ public class Gb32960_82 extends Gb32960DataProcess {
 
     @Override
     public void parse(byte[] content, Header header) {
-
 
 
     }

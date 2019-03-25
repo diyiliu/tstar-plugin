@@ -1,6 +1,5 @@
 package com.tiza.plugin.protocol.gb32960.cmd;
 
-import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.protocol.gb32960.Gb32960DataProcess;
@@ -14,7 +13,6 @@ import java.util.*;
 
 /**
  * 车辆登入
- *
  * Description: Gb32960_01
  * Author: DIYILIU
  * Update: 2019-03-18 16:57
@@ -34,6 +32,7 @@ public class Gb32960_01 extends Gb32960DataProcess {
         ByteBuf buf = Unpooled.copiedBuffer(content);
         // 数据采集时间
         Date date = CommonUtil.getBufDate(buf, 6);
+        gb32960Header.setDataTime(date.getTime());
 
         // 登入流水号
         buf.readUnsignedShort();
@@ -45,7 +44,7 @@ public class Gb32960_01 extends Gb32960DataProcess {
 
         int count = buf.readByte();
         int length = buf.readByte();
-        if (buf.readableBytes() < count * length){
+        if (buf.readableBytes() < count * length) {
 
             log.warn("解析可充电储能系统字节长度不足!");
             return;
@@ -53,7 +52,7 @@ public class Gb32960_01 extends Gb32960DataProcess {
 
         // 可充电储能子系统数
         List<String> codes = new ArrayList<>();
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             byte[] codeBytes = new byte[length];
             buf.readBytes(codeBytes);
 
@@ -66,9 +65,6 @@ public class Gb32960_01 extends Gb32960DataProcess {
         realMode.put("inOut", 1);
 
         // 处理实时上报数据
-        DeviceData deviceData = buildData(gb32960Header);
-        deviceData.setTime(date.getTime());
-        deviceData.setDataBody(realMode);
-        dataParse.detach(deviceData);
+        dataParse.detach(buildData(gb32960Header, "realMode", realMode));
     }
 }
