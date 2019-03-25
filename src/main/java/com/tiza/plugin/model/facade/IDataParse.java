@@ -4,8 +4,6 @@ import cn.com.tiza.tstar.common.process.BaseHandle;
 import com.tiza.plugin.model.DeviceData;
 import com.tiza.plugin.model.Position;
 
-import java.util.Map;
-
 /**
  * Description: IDataParse
  * Author: DIYILIU
@@ -14,8 +12,6 @@ import java.util.Map;
 public interface IDataParse {
 
     void detach(DeviceData deviceData);
-
-    void dealData(DeviceData deviceData, Map param, String type);
 
     void dealPosition(String deviceId, Position position);
 
