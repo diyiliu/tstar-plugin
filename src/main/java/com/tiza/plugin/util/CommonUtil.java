@@ -124,8 +124,7 @@ public class CommonUtil {
 
     /**
      * 读取时间
-     * 年月日
-     * 年月日 + 时分秒
+     * 年月日 时分秒
      *
      * @param buf
      * @param length (3或6)

@@ -7,12 +7,14 @@ import com.tiza.plugin.model.Gb32960Header;
 import com.tiza.plugin.model.Header;
 import com.tiza.plugin.model.facade.IDataParse;
 import com.tiza.plugin.model.facade.IDataProcess;
+import com.tiza.plugin.util.CommonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * Description: Gb32960DataProcess
@@ -106,6 +108,19 @@ public class Gb32960DataProcess implements IDataProcess {
         DeviceData deviceData = buildData(header);
         deviceData.setDataType(type);
         deviceData.setDataBody(data);
+
+        return deviceData;
+    }
+
+    protected DeviceData respData(Gb32960Header header){
+        ByteBuf buf = Unpooled.copiedBuffer(header.getContent());
+        // 数据采集时间
+        Date date = CommonUtil.getBufDate(buf, 6);
+        header.setDataTime(date.getTime());
+
+        DeviceData deviceData = buildData(header);
+        deviceData.setDataStatus(header.getResp());
+        deviceData.setDataType("cmdResp");
 
         return deviceData;
     }

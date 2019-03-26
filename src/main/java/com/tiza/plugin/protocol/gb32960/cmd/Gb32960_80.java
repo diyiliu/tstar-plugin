@@ -32,16 +32,14 @@ public class Gb32960_80 extends Gb32960DataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         Gb32960Header gb32960Header = (Gb32960Header) header;
-        int resp = gb32960Header.getResp();
+        // 指令应答
+        DeviceData deviceData = respData(gb32960Header);
 
         ByteBuf buf = Unpooled.copiedBuffer(content);
         // 数据采集时间
-        Date date = CommonUtil.getBufDate(buf, 6);
-        gb32960Header.setDataTime(date.getTime());
-
+        buf.readBytes(new byte[6]);
         int count = buf.readUnsignedByte();
         if (count > 252) {
-
             log.warn("参数总数异常: [{}]", count);
         }
 
@@ -76,8 +74,7 @@ public class Gb32960_80 extends Gb32960DataProcess {
         }
 
         // 处理指令应答
-        DeviceData deviceData = buildData(gb32960Header, "cmdResp", respMap);
-        deviceData.setDataStatus(resp);
+        deviceData.setDataBody(respMap);
         dataParse.detach(deviceData);
     }
 }
