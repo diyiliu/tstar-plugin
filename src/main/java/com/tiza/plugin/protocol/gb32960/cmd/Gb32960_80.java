@@ -32,10 +32,12 @@ public class Gb32960_80 extends Gb32960DataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         Gb32960Header gb32960Header = (Gb32960Header) header;
-        ByteBuf buf = Unpooled.copiedBuffer(content);
+        int resp = gb32960Header.getResp();
 
+        ByteBuf buf = Unpooled.copiedBuffer(content);
         // 数据采集时间
         Date date = CommonUtil.getBufDate(buf, 6);
+        gb32960Header.setDataTime(date.getTime());
 
         int count = buf.readUnsignedByte();
         if (count > 252) {
@@ -43,7 +45,7 @@ public class Gb32960_80 extends Gb32960DataProcess {
             log.warn("参数总数异常: [{}]", count);
         }
 
-        Map respMap = new HashMap();
+        Map<Integer, Object> respMap = new HashMap();
         Object value = "";
         for (int i = 0; i < count; i++) {
             int id = buf.readByte();
@@ -62,7 +64,9 @@ public class Gb32960_80 extends Gb32960DataProcess {
 
                 value = new String(bytes);
             } else if (0x05 == id || 0x0E == id) {
-                int length = (int) respMap.get(id - 1);
+                // 数据长度
+                int length = Integer.valueOf(String.valueOf(respMap.get(id - 1)));
+
                 byte[] bytes = new byte[length];
                 buf.readBytes(bytes);
 
@@ -71,12 +75,9 @@ public class Gb32960_80 extends Gb32960DataProcess {
             respMap.put(id, value);
         }
 
-        // 处理实时上报数据
-        DeviceData deviceData = buildData(gb32960Header);
-        deviceData.setDataType("cmdResp");
-
-        deviceData.setTime(date.getTime());
-        deviceData.setDataBody(respMap);
+        // 处理指令应答
+        DeviceData deviceData = buildData(gb32960Header, "cmdResp", respMap);
+        deviceData.setDataStatus(resp);
         dataParse.detach(deviceData);
     }
 }

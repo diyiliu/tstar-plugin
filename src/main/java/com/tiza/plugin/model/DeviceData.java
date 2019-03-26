@@ -19,6 +19,9 @@ public class DeviceData {
 
     private byte[] bytes = new byte[0];
 
+    /** 1: 成功; 2: 失败 **/
+    private Integer dataStatus;
+
     private String dataType;
 
     private Object dataBody;
