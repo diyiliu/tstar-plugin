@@ -62,7 +62,8 @@ public class Gb32960_80 extends Gb32960DataProcess {
 
                 value = new String(bytes);
             } else if (0x05 == id || 0x0E == id) {
-                byte[] bytes = new byte[buf.readableBytes()];
+                int length = (int) respMap.get(id - 1);
+                byte[] bytes = new byte[length];
                 buf.readBytes(bytes);
 
                 value = new String(bytes);

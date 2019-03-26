@@ -36,14 +36,14 @@ public class CommonUtil {
      * @param lng
      * @param lat
      */
-    public static void mountPosition(Position position, double lng, double lat){
+    public static void mountPosition(Position position, double lng, double lat) {
         Location location = LocationParser.getInstance().parse(lng, lat);
 
         if (location != null) {
             position.setProvince(location.getProv());
             position.setCity(location.getCity());
             position.setArea(location.getDistrict());
-            position.setProCode( location.getProvCode());
+            position.setProCode(location.getProvCode());
             position.setCityCode(location.getCityCode());
             position.setAreaCode(location.getDistrictCode());
         }
@@ -887,26 +887,29 @@ public class CommonUtil {
         if (0x01 == id || 0x02 == id || 0x03 == id ||
                 0x06 == id || 0x0A == id || 0x0B == id || 0x0F == id) {
 
-            return CommonUtil.longToBytes(Long.valueOf(value), 2);
+            return Unpooled.copiedBuffer(new byte[]{(byte) id}, CommonUtil.longToBytes(Long.valueOf(value), 2)).array();
         }
 
-        if (0x04 == id || 0x09 == id || 0x0C == id ||
-                0x0D == id || 0x10 == id) {
+        if (0x09 == id || 0x0C == id || 0x10 == id) {
 
-            return new byte[]{Byte.valueOf(value)};
+            return new byte[]{(byte) id, Byte.valueOf(value)};
         }
 
         if (0x07 == id || 0x08 == id) {
-            byte[] bytes = new byte[5];
+            byte[] bytes = new byte[6];
+            bytes[0] = (byte) id;
+
             byte[] src = value.getBytes();
-            System.arraycopy(src, 0, bytes, 0, src.length);
+            System.arraycopy(src, 0, bytes, 1, src.length);
 
             return bytes;
         }
 
         if (0x05 == id || 0x0E == id) {
+            byte[] bytes = value.getBytes();
+            int length = bytes.length;
 
-            return value.getBytes();
+            return Unpooled.copiedBuffer(new byte[]{(byte) (id - 1), (byte) length, (byte) id}, bytes).array();
         }
 
         return new byte[0];
