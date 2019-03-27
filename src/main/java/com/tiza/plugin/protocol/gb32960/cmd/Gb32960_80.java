@@ -46,7 +46,7 @@ public class Gb32960_80 extends Gb32960DataProcess {
         Map<Integer, Object> respMap = new HashMap();
         Object value = "";
         for (int i = 0; i < count; i++) {
-            int id = buf.readByte();
+            int id = buf.readUnsignedByte();
 
             if (0x01 == id || 0x02 == id || 0x03 == id ||
                     0x06 == id || 0x0A == id || 0x0B == id || 0x0F == id) {
@@ -69,7 +69,43 @@ public class Gb32960_80 extends Gb32960DataProcess {
                 buf.readBytes(bytes);
 
                 value = new String(bytes);
+            }else if (0x84 == id){
+                int n = buf.readByte();
+
+                Map extraMap = new HashMap();
+                for (int j = 0; j < n; j++){
+                    int option = buf.readByte();
+                    Object val = "";
+                    if (1 == option) {
+                        byte[] bytes = new byte[17];
+                        buf.readBytes(bytes);
+
+                        val = new String(bytes);
+                    } else if (2 == option || 4 == option) {
+
+                        val = buf.readByte();
+                    } else if (3 == option || 5 == option) {
+
+                        val = buf.readInt();
+                    } else if (6 == option || 7 == option || 8 == option) {
+                        int onOff = buf.readByte();
+                        int port = buf.readUnsignedShort();
+
+                        byte[] bytes = new byte[32];
+                        buf.readBytes(bytes);
+                        String ip = new String(bytes).trim();
+
+                        val = onOff + "," + port + "," + ip;
+                    } else {
+                        log.warn("0x84 选项[{}]内容未知!", option);
+                    }
+                    extraMap.put(option, val);
+                }
+
+                respMap.putAll(extraMap);
+                break;
             }
+
             respMap.put(id, value);
         }
 

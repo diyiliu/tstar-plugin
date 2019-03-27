@@ -58,6 +58,16 @@ public class CommonUtil {
         return false;
     }
 
+    public static byte[] str2Bytes(String str, int length){
+        byte[] bytes = new byte[length];
+        byte[] vinArr = str.getBytes();
+        int len = vinArr.length > length? length: vinArr.length;
+        System.arraycopy(vinArr, 0, bytes, 0, len);
+
+        return bytes;
+    }
+
+
     public static byte[] ipToBytes(String host) {
 
         String[] array = host.split("\\.");
