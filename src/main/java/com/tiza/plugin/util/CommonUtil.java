@@ -245,7 +245,6 @@ public class CommonUtil {
 
         int length = charArray.length / 2;
         byte[] bytes = new byte[length];
-
         for (int i = 0; i < length; i++) {
 
             String b = new String(new char[]{charArray[i * 2], charArray[i * 2 + 1]});
