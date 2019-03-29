@@ -52,7 +52,7 @@ public class Gb32960_02 extends Gb32960DataProcess {
         boolean interrupt = false;
         try {
             while (buf.readableBytes() > 0) {
-                int flag = buf.readByte();
+                int flag = buf.readUnsignedByte();
                 switch (flag) {
 
                     case 0x01:
@@ -91,6 +91,10 @@ public class Gb32960_02 extends Gb32960DataProcess {
                     case 0x09:
 
                         interrupt = parseStorageTemp(buf, paramValues);
+                        break;
+                    case 0xAA:
+
+                        interrupt = passThrough(buf, paramValues);
                         break;
                     default:
                         if (buf.readableBytes() > 2) {
@@ -901,6 +905,31 @@ public class Gb32960_02 extends Gb32960DataProcess {
             m.put("temps", l);
         }
         map.put("BATTERYTEMPINFO", list);
+
+        return false;
+    }
+
+
+    /**
+     * 透传数据处理
+     *
+     * @param byteBuf
+     * @param paramValues
+     * @return
+     */
+    private boolean passThrough(ByteBuf byteBuf, List paramValues){
+        Map map = new HashMap();
+        paramValues.add(map);
+
+        int length = byteBuf.readUnsignedShort();
+        if (byteBuf.readableBytes() < length){
+
+            return true;
+        }
+
+        byte[] bytes = new byte[length];
+        byteBuf.readBytes(bytes);
+        map.put("AA", bytes);
 
         return false;
     }
