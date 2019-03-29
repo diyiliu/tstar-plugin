@@ -15,7 +15,11 @@ public class VehicleInfo {
 
     private String terminalId;
 
+    /** 设备类型 2: 垃圾桶; 3: 垃圾袋; **/
     private Integer vehType;
+
+    /** 协议类型 **/
+    private String protocol;
 
     private String workParam;
 

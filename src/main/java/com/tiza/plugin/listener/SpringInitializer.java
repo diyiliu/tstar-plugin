@@ -1,6 +1,7 @@
 package com.tiza.plugin.listener;
 
 import com.tiza.plugin.model.facade.IDataProcess;
+import com.tiza.plugin.util.JacksonUtil;
 import com.tiza.plugin.util.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEvent;
@@ -23,7 +24,7 @@ public class SpringInitializer implements ApplicationListener {
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        log.info("协议解析初始化 ...");
+        log.info("协议{}解析初始化 ...", JacksonUtil.toJson(protocols));
 
         for (Class protocol : protocols) {
             Map parses = SpringUtil.getBeansOfType(protocol);
@@ -32,6 +33,8 @@ public class SpringInitializer implements ApplicationListener {
                 String key = (String) iterator.next();
                 IDataProcess process = (IDataProcess) parses.get(key);
                 process.init();
+
+                log.info("注册指令[{}]解析器...", key);
             }
         }
     }
