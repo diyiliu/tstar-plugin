@@ -58,10 +58,10 @@ public class CommonUtil {
         return false;
     }
 
-    public static byte[] str2Bytes(String str, int length){
+    public static byte[] str2Bytes(String str, int length) {
         byte[] bytes = new byte[length];
         byte[] vinArr = str.getBytes();
-        int len = vinArr.length > length? length: vinArr.length;
+        int len = vinArr.length > length ? length : vinArr.length;
         System.arraycopy(vinArr, 0, bytes, 0, len);
 
         return bytes;
@@ -620,21 +620,6 @@ public class CommonUtil {
     }
 
     /**
-     * @param val
-     * @param start
-     * @param len
-     * @param byteslen 夸字节的长度
-     * @return
-     */
-    public static int wirelessbits(int val, int start, int len, int byteslen) {
-        int res = 0;
-        String BinaryString = addZeroForNum(Integer.toBinaryString(val), byteslen);
-        String subBinaryString = BinaryString.substring(start, len);
-        res = BinaryString2int(subBinaryString);
-        return res;
-    }
-
-    /**
      * 任意2进制字符串 转int
      *
      * @param BinaryString
@@ -645,27 +630,6 @@ public class CommonUtil {
         for (char c : BinaryString.toCharArray())
             x = x * 2 + (c == '1' ? 1 : 0);
         return x;
-    }
-
-    /**
-     * 自动补齐
-     *
-     * @param str
-     * @param strLength
-     * @return
-     */
-    public static String addZeroForNum(String str, int strLength) {
-
-        int strLen = str.length();
-        StringBuffer sb = null;
-        while (strLen < strLength * 8) {
-            sb = new StringBuffer();
-            sb.append("0").append(str);// 左(前)补0
-            // sb.append(str).append("0");//右(后)补0
-            str = sb.toString();
-            strLen = str.length();
-        }
-        return str;
     }
 
     /**
@@ -921,5 +885,23 @@ public class CommonUtil {
         }
 
         return new byte[0];
+    }
+
+    /**
+     * 添加前导0
+     *
+     * @param str
+     * @param length
+     * @return
+     */
+    public static String addPrefixZero(String str, int length) {
+        int strLen = str.length();
+        if (strLen < length) {
+            String zero = String.format("%0" + (length - str.length()) + "d", 0);
+
+            return zero + str;
+        }
+
+        return str;
     }
 }
