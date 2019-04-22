@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -68,9 +69,17 @@ public class TestMain {
             {
                 this.put("a", 123);
             }
+            {
+                this.put("b", 123);
+            }
         };
 
-        String str = JacksonUtil.toJson(map);
-        System.out.println(str);
+        for(Iterator iterator = map.entrySet().iterator(); iterator.hasNext();){
+
+            iterator.next();
+            iterator.remove();
+        }
+
+        System.out.println(map.size());
     }
 }

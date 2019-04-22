@@ -2,7 +2,6 @@ package com.tiza.plugin.config;
 
 import com.tiza.plugin.cache.ICache;
 import com.tiza.plugin.cache.ram.RamCacheProvider;
-import com.tiza.plugin.listener.SpringInitializer;
 import com.tiza.plugin.util.SpringUtil;
 import org.springframework.context.annotation.Bean;
 

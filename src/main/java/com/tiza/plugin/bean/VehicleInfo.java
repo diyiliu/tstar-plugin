@@ -31,4 +31,8 @@ public class VehicleInfo {
     private Long datetime;
 
     private Integer status;
+
+    private String owner;
+
+    private String ownerName;
 }
