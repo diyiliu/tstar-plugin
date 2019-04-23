@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tstar-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/tstar-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.test.iml" filepath="$PROJECT_DIR$/.idea/modules/com.tiza.tstar-plugin.test.iml" />
     </modules>
   </component>
 </project>
