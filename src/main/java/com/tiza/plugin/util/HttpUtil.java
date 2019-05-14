@@ -1,5 +1,6 @@
 package com.tiza.plugin.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,9 +27,13 @@ import java.util.Map;
  * Author: DIYILIU
  * Update: 2018-12-21 09:38
  */
+
+@Slf4j
 public class HttpUtil {
 
     public static String postWithJsonAndParameter(String url, String json, Map param) throws Exception {
+        log.info("POST: {}, Body: {}, 参数: {}", url, json, JacksonUtil.toJson(param));
+
         URIBuilder builder = new URIBuilder(url);
         builder.addParameters(buildParameter(param));
         HttpPost httpPost = new HttpPost(builder.build());
@@ -41,6 +46,8 @@ public class HttpUtil {
     }
 
     public static String postWithJson(String url, String json) throws Exception {
+        log.info("POST: {}, 参数: {}", url, json);
+
         HttpPost httpPost = new HttpPost(url);
 
         StringEntity entity = new StringEntity(json, "UTF-8");
@@ -59,6 +66,8 @@ public class HttpUtil {
      * @throws Exception
      */
     public static String getForString(String url, Map param) throws Exception {
+        log.info("GET: {}, 参数: {}", url, JacksonUtil.toJson(param));
+
         HttpGet httpGet;
         if (MapUtils.isEmpty(param)) {
             httpGet = new HttpGet(url);
@@ -81,6 +90,8 @@ public class HttpUtil {
      * @throws Exception
      */
     public static String postForString(String url, Map param) throws Exception {
+        log.info("POST: {}, 参数: {}", url, JacksonUtil.toJson(param));
+
         HttpPost httpPost = new HttpPost(url);
         if (MapUtils.isNotEmpty(param)) {
             httpPost.setEntity(new UrlEncodedFormEntity(buildParameter(param), "UTF-8"));

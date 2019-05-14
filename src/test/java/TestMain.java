@@ -18,7 +18,11 @@ public class TestMain {
 
     @Test
     public void test(){
-        String str = "181206141226";
+        String str = "1812060F1226";
+
+        System.out.println(CommonUtil.pureNumber(str));
+
+        System.out.println(CommonUtil.parseBCDTime(CommonUtil.hexStringToBytes(str)));
 
         Date date = new Date(CommonUtil.parseBCDTime(CommonUtil.hexStringToBytes(str)));
         System.out.println(date);

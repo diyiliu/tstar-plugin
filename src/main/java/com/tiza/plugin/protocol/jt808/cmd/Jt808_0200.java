@@ -31,6 +31,7 @@ public class Jt808_0200 extends Jt808DataProcess {
     @Override
     public void parse(byte[] content, Header header) {
         Jt808Header jt808Header = (Jt808Header) header;
+        String terminal = jt808Header.getTerminalId();
 
         ByteBuf buf = Unpooled.copiedBuffer(content);
         long alarmFlag = buf.readUnsignedInt();
@@ -46,6 +47,10 @@ public class Jt808_0200 extends Jt808DataProcess {
         byte[] timeBytes = new byte[6];
         buf.readBytes(timeBytes);
         long time = CommonUtil.parseBCDTime(timeBytes);
+        if (time == 0){
+            log.info("设备[{}]GPS时间[{}]异常", terminal, CommonUtil.bytesToStr(timeBytes));
+            return;
+        }
 
         while (buf.readableBytes() > 2) {
             int id = buf.readByte();
@@ -57,8 +62,7 @@ public class Jt808_0200 extends Jt808DataProcess {
             buf.readBytes(bytes);
         }
 
-        log.info("收到终端[{}]位置信息[{}, {}, {}] ... ", jt808Header.getTerminalId(),
-                DateUtil.dateToString(new Date(time)), lat, lng);
+        log.info("收到终端[{}]位置信息[{}, {}, {}] ... ", terminal, DateUtil.dateToString(new Date(time)), lat, lng);
 
         double latD = CommonUtil.keepDecimal(lat, 0.000001, 6);
         double lngD = CommonUtil.keepDecimal(lng, 0.000001, 6);
@@ -74,6 +78,6 @@ public class Jt808_0200 extends Jt808DataProcess {
 
         CommonUtil.mountPosition(position, position.getEnLng(), position.getEnLat());
 
-        dataParse.dealPosition(jt808Header.getTerminalId(), position);
+        dataParse.dealPosition(terminal, position);
     }
 }

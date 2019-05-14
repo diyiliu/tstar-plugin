@@ -395,6 +395,11 @@ public class CommonUtil {
         }
 
         String str = CommonUtil.bytesToStr(bytes);
+        if (!pureNumber(str)) {
+
+            return 0;
+        }
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
 
@@ -406,6 +411,13 @@ public class CommonUtil {
         calendar.set(Calendar.SECOND, Integer.parseInt(str.substring(10, 12)));
 
         return calendar.getTimeInMillis();
+    }
+
+    public static boolean pureNumber(String str) {
+        String regex = ".*[a-zA-Z]+.*";
+        Matcher m = Pattern.compile(regex).matcher(str);
+
+        return !m.matches();
     }
 
     /**
@@ -903,5 +915,13 @@ public class CommonUtil {
         }
 
         return str;
+    }
+
+    public static <T> int convertInt(T t) {
+        if (t == null){
+            return  0;
+        }
+
+        return Integer.parseInt(String.valueOf(t));
     }
 }
