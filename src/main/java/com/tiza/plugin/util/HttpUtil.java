@@ -103,11 +103,11 @@ public class HttpUtil {
     private static String askFor(HttpRequestBase httpRequest) throws Exception {
         RequestConfig config = RequestConfig.custom()
                 // 连接时间
-                .setConnectTimeout(5 * 1000)
+                .setConnectTimeout(10 * 1000)
                 // 请求超时
-                .setConnectionRequestTimeout(15 * 1000)
+                .setConnectionRequestTimeout(30 * 1000)
                 // 数据传输时间
-                .setSocketTimeout(15 * 1000).build();
+                .setSocketTimeout(20 * 1000).build();
 
         HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
         HttpResponse response = client.execute(httpRequest);
