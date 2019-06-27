@@ -75,9 +75,9 @@ public class Jt808_0200 extends Jt808DataProcess {
         position.setEnLat(enLatLng[0]);
         position.setEnLng(enLatLng[1]);
         position.setTime(time);
+        position.setCmd(jt808Header.getCmd());
 
         CommonUtil.mountPosition(position, position.getEnLng(), position.getEnLat());
-
         dataParse.dealPosition(terminal, position);
     }
 }

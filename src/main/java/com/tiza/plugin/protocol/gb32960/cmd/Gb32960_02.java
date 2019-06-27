@@ -94,7 +94,12 @@ public class Gb32960_02 extends Gb32960DataProcess {
                         break;
                     case 0xAA:
 
-                        interrupt = passThrough(buf, paramValues);
+                        interrupt = passThrough(buf, paramValues, "AA");
+                        break;
+                    case 0x91:
+                        // 环卫车 can 包数量
+                        buf.readByte();
+                        interrupt = passThrough(buf, paramValues, "91");
                         break;
                     default:
                         if (buf.readableBytes() > 2) {
@@ -917,7 +922,7 @@ public class Gb32960_02 extends Gb32960DataProcess {
      * @param paramValues
      * @return
      */
-    private boolean passThrough(ByteBuf byteBuf, List paramValues){
+    private boolean passThrough(ByteBuf byteBuf, List paramValues, String key){
         Map map = new HashMap();
         paramValues.add(map);
 
@@ -929,7 +934,7 @@ public class Gb32960_02 extends Gb32960DataProcess {
 
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
-        map.put("AA", bytes);
+        map.put(key, bytes);
 
         return false;
     }

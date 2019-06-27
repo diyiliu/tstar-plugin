@@ -16,6 +16,7 @@ import javax.script.ScriptException;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -274,7 +275,6 @@ public class CommonUtil {
     }
 
     public static double keepDecimal(double d, int digit) {
-
         BigDecimal decimal = new BigDecimal(d);
         decimal = decimal.setScale(digit, RoundingMode.HALF_UP);
 
@@ -918,10 +918,53 @@ public class CommonUtil {
     }
 
     public static <T> int convertInt(T t) {
-        if (t == null){
-            return  0;
+        if (t == null) {
+            return 0;
         }
 
         return Integer.parseInt(String.valueOf(t));
+    }
+
+    /**
+     * 字节转二进制字符串
+     *
+     * @param b
+     * @return
+     */
+    public static String byte2BinaryStr(byte b) {
+        StringBuffer strBuf = new StringBuffer();
+        for (int i = 0; i < 8; i++) {
+            int value = (b >> i) & 0x01;
+            strBuf.append(value);
+        }
+
+        return strBuf.toString();
+    }
+
+    public static String bytes2BinaryStr(byte[] bytes) {
+        StringBuffer strBuf = new StringBuffer();
+        for (byte b : bytes) {
+            strBuf.append(byte2BinaryStr(b));
+        }
+        return strBuf.toString();
+    }
+
+    public static byte[] tstarKafkaArray(String terminal, int cmd, String str, long time, int serial) {
+        byte[] terminalArr = terminal.getBytes();
+        int tLen = terminalArr.length;
+
+        byte[] msgArr = str.getBytes(Charset.forName("UTF-8"));
+        int mLen = msgArr.length;
+
+        ByteBuf buf = Unpooled.buffer(21 + tLen + mLen);
+        buf.writeByte(tLen);
+        buf.writeBytes(terminalArr);
+        buf.writeLong(time);
+        buf.writeInt(cmd);
+        buf.writeInt(serial);
+        buf.writeInt(mLen);
+        buf.writeBytes(msgArr);
+
+        return buf.array();
     }
 }

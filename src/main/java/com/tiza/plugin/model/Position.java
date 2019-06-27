@@ -29,4 +29,6 @@ public class Position {
     private Integer status;
 
     private Double speed;
+
+    private int cmd;
 }
