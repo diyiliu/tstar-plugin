@@ -18,6 +18,7 @@ public class Position {
     private Double enLng;
     private Double enLat;
 
+    private String address;
     private String province;
     private String city;
     private String area;

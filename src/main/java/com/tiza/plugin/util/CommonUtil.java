@@ -545,25 +545,6 @@ public class CommonUtil {
         return retVal;
     }
 
-    public static void main(String[] args) {
-
-
-        /**
-         byte[] array = new byte[]{0x03, 0x3D, 0x55, 0x7A, 0x39};
-         String sim = null;
-         sim = parseSIM(array);
-
-         System.out.println(sim);
-         array =  packSIM(sim);
-         sim = parseSIM(array);
-
-         System.out.println(sim);
-         */
-
-        System.out.println(keepDecimal(12.345, 0.01, 1));
-
-    }
-
     /**
      * 对象转数组
      *
