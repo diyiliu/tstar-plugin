@@ -105,6 +105,10 @@ public class Gb32960_80 extends Gb32960DataProcess {
                 respMap.putAll(extraMap);
                 break;
             }
+            // 九合终端 VIN 查询
+            else if (0x80 == id){
+
+            }
 
             respMap.put(id, value);
         }
